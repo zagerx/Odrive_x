@@ -11,9 +11,7 @@ void openloop_controller_update(void)
 	p = &openloop_controller_;
 	
 	float prev_Id = p->Idq_setpoint_.d;
-	//float prev_Iq = p->Idq_setpoint_.q;
 	float prev_Vd = p->Vdq_setpoint_.d;
-	//float prev_Vq = p->Vdq_setpoint_.q;
 	float phase = p->phase_;
 	float phase_vel = p->phase_vel_;
 	
@@ -28,7 +26,6 @@ void openloop_controller_update(void)
 	p->phase_vel_ = phase_vel;
 	p->phase_ = wrap_pm_pi(phase + phase_vel * dt);
 	p->total_distance_ = p->total_distance_ + phase_vel * dt;
-	//p->timestamp_ = timestamp;
 }
 /****************************************************************************/
 

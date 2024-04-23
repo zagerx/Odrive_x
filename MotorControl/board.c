@@ -55,8 +55,12 @@ uint8_t fetch_and_reset_adcs(Iph_ABC_t *current)
 uint32_t time_cntr=0;
 volatile uint32_t timestamp_ = 0;
 extern  void control_loop_cb(void);  //在main.c文件中
+extern uint8_t usb_sndbuff[128];
 
 //中断频率16KHz，进入中断的同时触发ADC
+extern uint32_t print_flag;
+extern AXIS_State_Type  current_state_;
+
 void TIM1_UP_TIM10_IRQHandler(void)
 {
 	uint32_t i;
@@ -70,18 +74,28 @@ void TIM1_UP_TIM10_IRQHandler(void)
 		LED_blink;
 	}
 	
+	for(i=0;i<20;i++);                   //延时，同时等待ADC完毕
+	fetch_and_reset_adcs(&current0);     //电流采样，获得的采样值在current0
 	uint8_t counting_down = TIM1->CR1 & TIM_CR1_DIR;
 	if(!counting_down)   //=0为递增计数,上臂为低下臂为高,此时采样
 	{
-		sample_now();                        //读取角度
-		fetch_and_reset_adcs(&current0);     //电流采样，获得的采样值在current0
-		current_meas_cb(timestamp_, &current0);  //传入采样值并运算
-		control_loop_cb();
+		current_meas_cb(timestamp_, &current0);  //传入采样值并运算 clark变换
+//		control_loop_cb();
+		encoder_update();
+		controller_update();//更新力矩
+		if(current_state_ == AXIS_STATE_ENCODER_OFFSET_CALIBRATION)
+		{
+			openloop_controller_update();
+		}
+		// motor_update();
+		// foc_update();
 	}
 	else
 	{
+		motor_update();
+		foc_update();
 		for(i=0;i<20;i++);                   //延时，同时等待ADC完毕
-		fetch_and_reset_adcs(&current0);     //电流采样
+//		fetch_and_reset_adcs(&current0);     //电流采样
 		dc_calib_cb(&current0);  //timestamp_ + TIM_1_8_PERIOD_CLOCKS * (TIM_1_8_RCR + 1), 
 		pwm_update_cb();         //timestamp_ + 3 * TIM_1_8_PERIOD_CLOCKS * (TIM_1_8_RCR + 1);
 	}

@@ -51,7 +51,8 @@ void update_pll_gains(void)
 	pll_kp_ = 2.0f * encoder_config.bandwidth;  // basic conversion to discrete time
 	pll_ki_ = 0.25f * (pll_kp_ * pll_kp_); // Critically damped
 	// Check that we don't get problems with discrete time approximation
-	if (!(current_meas_period * pll_kp_ < 1.0f))encoder_set_error(ERROR_UNSTABLE_GAIN);
+	if (!(current_meas_period * pll_kp_ < 1.0f))
+		encoder_set_error(ERROR_UNSTABLE_GAIN);
 }
 /*****************************************************************************/
 
@@ -119,12 +120,7 @@ bool run_offset_calibration(void)
 	
 	// Reset state variables
 	memset(&openloop_controller_,0, sizeof(OPENLOOP_struct));   //清零openloop的结构体
-//	openloop_controller_.Idq_setpoint_.d = 0.0f;
-//	openloop_controller_.Idq_setpoint_.q = 0.0f;
-//	openloop_controller_.Vdq_setpoint_.d = 0.0f;
-//	openloop_controller_.Vdq_setpoint_.q = 0.0f;
-//	openloop_controller_.phase_ = 0.0f;
-//	openloop_controller_.phase_vel_ = 0.0f;
+
 	
 	float max_current_ramp = motor_config.calibration_current / start_lock_duration * 2.0f;
 	openloop_controller_.max_current_ramp_ = max_current_ramp;
@@ -234,7 +230,8 @@ void abs_spi_cb(void)
 			rawVal = SPIx_ReadWriteByte(0xffff);  //encoder.hpp 第144行
 			SPI_CS0_H;
 		
-			if(ams_parity(rawVal) || ((rawVal >> 14) & 1))return;
+			if(ams_parity(rawVal) || ((rawVal >> 14) & 1))
+				return;
 			pos = (rawVal & 0x3fff);
 			break;
 		case MODE_SPI_MA730:
@@ -285,45 +282,24 @@ bool encoder_update(void)
 	// update internal encoder state.
 	int32_t delta_enc = 0;
 	int32_t pos_abs_latched = pos_abs_; //LATCH
-	
+	sample_now();                        //跟新角度RAW
+
 	switch(encoder_config.mode)
 	{
-		case MODE_INCREMENTAL: {
-			//TODO: use count_in_cpr_ instead as shadow_count_ can overflow or use 64 bit
-			int16_t delta_enc_16 = (int16_t)tim_cnt_sample_ - (int16_t)shadow_count_;
-			delta_enc = (int32_t)delta_enc_16; //sign extend
-		} break;
+
 		
 		case MODE_SPI_AS5047P:
-		case MODE_SPI_MT6701:
-		case MODE_SPI_MA730:
-		case MODE_SPI_TLE5012B: {
-			if(abs_spi_pos_updated_ == false)  //正常应该每次都为true，因为sample_now()刚被执行过。
-			{
-				// Low pass filter the error
-				spi_error_rate_ += current_meas_period * (1.0f - spi_error_rate_);
-				if (spi_error_rate_ > 0.05f)
-				{
-					encoder_set_error(ERROR_ABS_SPI_COM_FAIL);
-					return 0;
-				}
-			}
-			else
-			{
-				// Low pass filter the error
-				spi_error_rate_ += current_meas_period * (0.0f - spi_error_rate_);
-			}
-			
+		 {
 			abs_spi_pos_updated_ = false;
 			delta_enc = pos_abs_latched - count_in_cpr_; //LATCH
 			delta_enc = mod(delta_enc, encoder_config.cpr);
-			if(delta_enc > encoder_config.cpr/2)delta_enc -= encoder_config.cpr;
+			if(delta_enc > encoder_config.cpr/2)
+				delta_enc -= encoder_config.cpr;
 		} break;
 		
 		default:
 			encoder_set_error(ERROR_UNSUPPORTED_ENCODER_MODE);
 			return 0;
-			//break;
 	}
 	
 	shadow_count_ += delta_enc;

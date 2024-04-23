@@ -428,13 +428,6 @@ void motor_update(void)
 		vq += *phase_vel * (2.0f/3.0f) * (motor_config.torque_constant / motor_config.pole_pairs);
 	}
 	
-	if (motor_config.motor_type == MOTOR_TYPE_GIMBAL)
-	{
-		// reinterpret current as voltage
-		motor_Vdq_setpoint_.d = vd + id;
-		motor_Vdq_setpoint_.q = vq + iq;
-	}
-	else
 	{
 		motor_Vdq_setpoint_.d = vd;
 		motor_Vdq_setpoint_.q = vq;
