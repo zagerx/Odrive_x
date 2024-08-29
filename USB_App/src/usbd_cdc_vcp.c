@@ -277,17 +277,6 @@ extern void USBcommander_run(void);  //函数声明
   */
 static uint16_t VCP_DataRx (uint8_t* Buf, uint32_t Len)
 {
-  uint32_t i;
-  
-  for (i = 0; i < Len; i++)
-  {
-		usb_recbuff[i] = *(Buf + i);
-    //USART_SendData(EVAL_COM1, *(Buf + i) );
-    //while(USART_GetFlagStatus(EVAL_COM1, USART_FLAG_TXE) == RESET); 
-  }
-	usb_rcv_count = i;
-	USBcommander_run();   //USB的通信处理
-	
   return USBD_OK;
 }
 

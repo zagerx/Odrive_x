@@ -32,6 +32,7 @@
 #include "trapTraj.h"
 #include "controller.h"
 
+#include "motor_debug.h"
 /****************************************************************************/
 #define TIM_1_8_CLOCK_HZ 168000000
 #define TIM_1_8_PERIOD_CLOCKS 3500
@@ -51,28 +52,28 @@ static const int current_meas_hz = CURRENT_MEAS_HZ;
 /****************************************************************************/
 //错误标志位
 #define  ERROR_NONE                             0
-#define  ERROR_MODULATION_MAGNITUDE            (1<<0)
-#define  ERROR_CURRENT_SENSE_SATURATION        (1<<1)
-#define  ERROR_CURRENT_LIMIT_VIOLATION         (1<<2)
-#define  ERROR_PHASE_RESISTANCE_OUT_OF_RANGE   (1<<3)
-#define  ERROR_UNKNOWN_VBUS_VOLTAGE            (1<<4)
-#define  ERROR_NOT_HIGH_CURRENT_MOTOR          (1<<5)
-#define  ERROR_UNBALANCED_PHASES               (1<<6)
-#define  ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE   (1<<7)
-#define  ERROR_UNSTABLE_GAIN                   (1<<8)
-#define  ERROR_ABS_SPI_COM_FAIL                (1<<9)
-#define  ERROR_UNSUPPORTED_ENCODER_MODE        (1<<10)
-#define  ERROR_INDEX_NOT_FOUND_YET             (1<<11)
-#define  ERROR_HALL_NOT_CALIBRATED_YET         (1<<12)
-#define  ERROR_NO_RESPONSE                     (1<<13)
-#define  ERROR_CPR_POLEPAIRS_MISMATCH          (1<<14)
-#define  ERROR_INVALID_STATE                   (1<<15)
-#define  ERROR_INVALID_CIRCULAR_RANGE          (1<<16)
-#define  ERROR_INVALID_INPUT_MODE              (1<<17)
-#define  ERROR_OVERSPEED                       (1<<18)
-#define  ERROR_SPINOUT_DETECTED                (1<<19)
-#define  ERROR_INVALID_ESTIMATE                (1<<20)
-#define  ERROR_UNKNOWN_PHASE_VEL               (1<<21)
+#define  ERROR_MODULATION_MAGNITUDE            (1<<0)//0x01
+#define  ERROR_CURRENT_SENSE_SATURATION        (1<<1)//0x02
+#define  ERROR_CURRENT_LIMIT_VIOLATION         (1<<2)//0x04
+#define  ERROR_PHASE_RESISTANCE_OUT_OF_RANGE   (1<<3)//0x08
+#define  ERROR_UNKNOWN_VBUS_VOLTAGE            (1<<4)//0x10
+#define  ERROR_NOT_HIGH_CURRENT_MOTOR          (1<<5)//0X20
+#define  ERROR_UNBALANCED_PHASES               (1<<6)//0X40
+#define  ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE   (1<<7)//0X80
+#define  ERROR_UNSTABLE_GAIN                   (1<<8)//0X100
+#define  ERROR_ABS_SPI_COM_FAIL                (1<<9)//0X200
+#define  ERROR_UNSUPPORTED_ENCODER_MODE        (1<<10)//0X400
+#define  ERROR_INDEX_NOT_FOUND_YET             (1<<11)//0X800
+#define  ERROR_HALL_NOT_CALIBRATED_YET         (1<<12)//0x1000
+#define  ERROR_NO_RESPONSE                     (1<<13)//0x2000
+#define  ERROR_CPR_POLEPAIRS_MISMATCH          (1<<14)//0x4000
+#define  ERROR_INVALID_STATE                   (1<<15)//0x8000
+#define  ERROR_INVALID_CIRCULAR_RANGE          (1<<16)//0x10000
+#define  ERROR_INVALID_INPUT_MODE              (1<<17)//0x20000
+#define  ERROR_OVERSPEED                       (1<<18)//0x40000
+#define  ERROR_SPINOUT_DETECTED                (1<<19)//x080000
+#define  ERROR_INVALID_ESTIMATE                (1<<20)//0x100000
+#define  ERROR_UNKNOWN_PHASE_VEL               (1<<21)//0x200000
 /****************************************************************************/
 //根据驱动板硬件设置参数
 #define VBUS_S_DIVIDER_RATIO   18.73f    //电源分压电阻2.2k+39k

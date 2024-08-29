@@ -91,6 +91,8 @@ bool FOC_current(float Id_des, float Iq_des, float I_phase, float pwm_phase)   /
 	Iq_measured += I_measured_report_filter_k * (Iq - Iq_measured);
 	Id_measured += I_measured_report_filter_k * (Id - Id_measured);
 	
+	motor_debug.id_real = Id;
+	motor_debug.iq_real = Iq;
 	// Current error
 	float Ierr_d = Id_des - Id;
 	float Ierr_q = Iq_des - Iq;

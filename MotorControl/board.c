@@ -43,6 +43,10 @@ uint8_t fetch_and_reset_adcs(Iph_ABC_t *current)
 	current->phC = phase_current_from_adcval(ADC3->JDR1);
 	current->phA = -current->phB - current->phC;
 	
+	motor_debug.ia_rawreal = current->phA;
+	motor_debug.ib_rawreal = current->phB;
+	motor_debug.ic_rawreal = current->phC;
+
 	ADC1->SR = ~(ADC_SR_JEOC);
 	ADC2->SR = ~(ADC_SR_JEOC | ADC_SR_OVR);
 	ADC3->SR = ~(ADC_SR_JEOC | ADC_SR_OVR);

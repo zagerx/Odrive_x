@@ -319,6 +319,10 @@ void current_meas_cb(uint32_t timestamp, Iph_ABC_t *current)
 		current_meas_.phC = 0;
 	}
 	
+	motor_debug.ia_real = current_meas_.phA;
+	motor_debug.ib_real = current_meas_.phB;
+	motor_debug.ic_real = current_meas_.phC;
+	
 	on_measurement(timestamp, &current_meas_);
 }
 /****************************************************************************/
